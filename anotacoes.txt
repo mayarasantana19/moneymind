@@ -1,0 +1,19 @@
+Precisa salvar as informacoes a depender do usuario
+
+Checar toda a responsividade
+
+Criar página controle de gastos
+
+Criar página de investimentos
+
+Criar página sobre nós
+
+Colocar termos lgpd em login e todo o site
+
+Mudar footer
+
+Melhorar aparencia do site
+
+Melhorar estilo da tela de login
+
+Investigar porque o header faz transição ao diminuir a página

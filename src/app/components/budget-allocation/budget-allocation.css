@@ -1,0 +1,7 @@
+/* Exemplo de estilos no component.css */
+.budget-allocation-container {
+  display: flex; /* Para colocar os cards lado a lado */
+  gap: 20px; /* Espaçamento entre os cards */
+  justify-content: center;
+  margin: 40px 0;
+}

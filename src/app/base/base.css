@@ -1,0 +1,101 @@
+/* Definindo a fonte Inter e as novas cores corporativas do MoneyMind */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f7f7f7;
+    /* Fundo Secundário (Light Gray) */
+}
+
+/* Gradiente Principal (Mind Blue e Growth Green) */
+.finance-gradient {
+    background: linear-gradient(135deg, #0A477A 0%, #6AA84F 100%);
+}
+
+/* Estilos do Slider (Thumb) - Cor Mind Blue para estabilidade */
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #0A477A;
+    /* Mind Blue */
+    cursor: pointer;
+}
+
+input[type="range"]::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #0A477A;
+    /* Mind Blue */
+    cursor: pointer;
+}
+
+/* Classes auxiliares para as cores da paleta */
+.text-mind-blue {
+    color: #0A477A;
+}
+
+.bg-cta-orange {
+    background-color: #F4A261;
+}
+
+.hover\:bg-cta-orange-dark:hover {
+    background-color: #E39352;
+}
+
+/* Escurecido para hover */
+.text-growth-green {
+    color: #6AA84F;
+}
+
+/* Estilo para Roteamento de Páginas */
+/* CORREÇÃO CRÍTICA: !important adicionado para garantir que o display:none prevaleça */
+.page-content.hidden {
+    display: none !important;
+}
+
+/* Estilo para link de navegação ativo */
+.nav-link.active-link {
+    color: #0A477A;
+    /* Mind Blue */
+    border-bottom: 2px solid #0A477A;
+}
+
+/* Estilo para mensagem de status */
+#statusMessage {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+#statusMessage.visible {
+    opacity: 1;
+}
+
+/* Estilo para os Mini-Livros */
+.mini-book-card {
+    min-height: 250px;
+    transition: transform 0.3s ease;
+}
+
+.mini-book-card:hover {
+    transform: translateY(-5px);
+}
+
+/* Estilos para o sistema de abas da calculadora */
+.tab-button.active-tab {
+    background-color: #0A477A;
+    /* Mind Blue */
+    color: white;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos para o bloco de investimentos */
+.investment-block {
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1.5rem;
+}

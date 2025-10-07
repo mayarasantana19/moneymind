@@ -1,0 +1,45 @@
+.welcome-banner {
+  /* Gradiente Azul/Verde conforme a imagem */
+  background: linear-gradient(to right, #007bff, #28a745); 
+  color: white;
+  padding: 80px 50px;
+  text-align: center;
+}
+
+.greeting {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.welcome-banner h1 {
+  font-size: 44px;
+  margin-bottom: 20px;
+  line-height: 1.2;
+}
+
+.welcome-banner strong {
+    font-weight: 900;
+}
+
+.welcome-banner .subtitle {
+  font-size: 18px;
+  margin-bottom: 30px;
+  opacity: 0.9;
+}
+
+.cta-button {
+  background-color: #ffc107; /* Amarelo Vibrante */
+  color: #333;
+  border: none;
+  padding: 15px 30px;
+  font-size: 18px;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  text-decoration: none;
+}
+
+.cta-button:hover {
+  background-color: #e0a800;
+}

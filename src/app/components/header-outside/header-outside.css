@@ -1,0 +1,166 @@
+/* =================================== */
+/* 1. ESTILOS BASE (DESKTOP) */
+/* =================================== */
+
+.header {
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 1rem 2rem;
+    font-family: Arial, sans-serif;
+}
+
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+    text-decoration: none;
+    z-index: 10; 
+}
+
+strong {
+    color: #255388;
+}
+
+/* Navegação em Desktop: Linha Horizontal */
+.nav ul {
+    list-style: none;
+    display: flex;
+    margin: 0;
+    padding: 0;
+    /* Alinha todos os itens da lista (links e botão) verticalmente */
+    align-items: center; 
+}
+
+.nav li {
+    margin: 0 15px;
+}
+
+/* Estilo unificado para links e botões */
+.nav a,
+.nav button {
+    text-decoration: none;
+    color: #555;
+    font-weight: 500;
+    padding: 0.5rem 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: border-color 0.3s ease-in-out, color 0.3s ease-in-out;
+}
+
+.nav a:hover,
+.nav button:hover {
+    color: #000;
+}
+
+.nav a.active {
+    color: #000;
+    border-bottom-color: #4a90e2; 
+}
+
+/* ESTILO DO BOTÃO DE SAIR (ALINHAMENTO ÍCONE/TEXTO) */
+.nav button {
+    display: flex;
+    align-items: center; 
+    gap: 5px;
+    height: 100%; 
+    line-height: normal;
+}
+
+.nav button i {
+    font-size: 1.1rem; 
+}
+
+/* Oculta o botão de menu em telas grandes e estiliza o ícone */
+.menu-toggle {
+    display: none;
+    padding: 0;
+    border: none;
+    background: none;
+}
+
+.menu-toggle i {
+    font-size: 1.8rem;
+    color: #333;
+}
+
+
+/* =================================== */
+/* 2. RESPONSIVIDADE (MOBILE/TABLET) */
+/* =================================== */
+
+@media (max-width: 768px) {
+    .header-container {
+        /* Garante que o logo e o botão de toggle fiquem alinhados */
+        justify-content: space-between;
+    }
+    
+    /* 1. Menu Toggle (Botão Hambúrguer) */
+    .menu-toggle {
+        display: block; /* 🟢 TORNAR VISÍVEL: Mostra o botão em telas pequenas */
+        cursor: pointer;
+        z-index: 10;
+    }
+    
+    /* 2. Container da Navegação - Esconde o menu fora da tela */
+    .nav {
+        /* Posicionamento fixo para cobrir toda a viewport */
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.98); 
+        padding-top: 4.5rem; 
+        
+        /* 🟢 ESCONDER: Move o menu 100% para a direita (fora da tela) */
+        transform: translateX(100%);
+        z-index: 9;
+        overflow-y: auto;
+    }
+
+    /* 3. Classe para Mostrar o Menu */
+    .nav.open {
+        /* 🟢 MOSTRAR: Move o menu de volta para a tela */
+        transform: translateX(0); 
+    }
+
+    /* 4. Lista Vertical */
+    .nav ul {
+        flex-direction: column; /* Organiza itens verticalmente */
+        align-items: center;
+    }
+
+    .nav li {
+        margin: 1.5rem 0;
+        width: 80%;
+        text-align: center;
+    }
+
+    /* Aumenta a fonte e centraliza elementos em mobile */
+    .nav a,
+    .nav button {
+        font-size: 1.2rem;
+        padding: 1rem 0;
+        display: block;
+        border-bottom: none;
+        width: 100%;
+        /* Centraliza o conteúdo dentro da área do link/botão */
+        justify-content: center; 
+    }
+    
+    .nav a.active {
+        border-bottom-color: transparent; 
+        background-color: #f0f0f0; 
+        border-radius: 4px;
+    }
+}

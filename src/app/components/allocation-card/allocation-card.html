@@ -1,0 +1,12 @@
+<div class="card" [ngClass]="cor">
+  <div class="limite-header">
+    <span class="label">LIMITE MÁXIMO ({{ percentual }}%)</span>
+    <span class="valor-limite">R$ {{ limiteMaximo | number:'1.2-2':'pt' }}</span>
+  </div>
+  
+  <div class="conteudo">
+    <span class="icone">{{ icone }}</span>
+    <h3 class="titulo">{{ titulo }}</h3>
+    <p class="descricao">{{ descricao }}</p>
+  </div>
+</div>

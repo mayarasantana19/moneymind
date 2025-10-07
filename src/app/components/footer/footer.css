@@ -1,0 +1,57 @@
+/* FOOTER CSS BÁSICO */
+footer {
+    background-color: #333; /* Cor de fundo escura */
+    color: #fff; /* Cor do texto */
+    padding: 20px 10px 10px; /* Preenchimento interno */
+    font-family: Arial, sans-serif;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-around; /* Distribui as seções */
+    max-width: 1200px;
+    margin: 0;
+    flex-wrap: wrap; /* Permite quebras de linha em telas pequenas */
+}
+
+.footer-section {
+    flex: 1; /* Distribuição igual de espaço */
+    min-width: 200px; /* Largura mínima para cada seção */
+    margin: 10px;
+}
+
+.footer-section h3 {
+    margin-bottom: 15px;
+    font-size: 1.2em;
+}
+
+.footer-section p {
+    font-size: 0.9em;
+    line-height: 1.6;
+}
+
+.footer-section ul {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-section ul li {
+    margin-bottom: 8px;
+}
+
+.footer-section ul li a {
+    color: #ccc; /* Cor do link */
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.footer-section ul li a:hover {
+    color: #fff; /* Cor do link ao passar o mouse */
+}
+
+.footer-bottom {
+    text-align: center;
+    padding-top: 15px;
+    border-top: 1px solid #444; /* Linha divisória */
+    font-size: 0.8em;
+}

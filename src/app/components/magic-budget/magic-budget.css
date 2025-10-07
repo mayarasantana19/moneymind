@@ -1,0 +1,166 @@
+/* -------------------------------------- */
+/* LAYOUT BASE E TIPOGRAFIA */
+/* -------------------------------------- */
+.magic-budget-section {
+  max-width: 1000px;
+  margin: 40px auto;
+  padding: 20px;
+  text-align: center;
+  font-family: 'Inter', sans-serif;
+  color: #333;
+}
+
+h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #1a1a1a;
+}
+
+p {
+  color: #666;
+  margin-bottom: 30px;
+}
+
+/* -------------------------------------- */
+/* ESTILO DA CAIXA DE INPUT (RENDIMENTO) */
+/* -------------------------------------- */
+.input-box {
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 0 auto 40px;
+  max-width: 400px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative; /* CORREÇÃO 1: Essencial para posicionar o input invisível */
+}
+
+.input-box label {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #444;
+  margin-bottom: 10px;
+}
+
+/* Esconde o input real, deixando apenas o valor visível (como na imagem) */
+
+
+.input-box input:focus {
+    outline: none;
+}
+
+.input-value-display {
+  /* Estilo do número grande (2500) */
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #0d47a1; /* Azul escuro para destaque */
+  padding: 5px 0;
+  cursor: pointer; /* Indica que é interativo */
+  min-height: 40px; /* Garante altura mínima para clique */
+}
+
+/* -------------------------------------- */
+/* CONTAINER DOS CARDS */
+/* -------------------------------------- */
+.allocation-cards-container {
+  display: flex;
+  flex-wrap: wrap; /* Permite quebrar linha em telas pequenas */
+  gap: 20px;
+  justify-content: center;
+}
+
+/* -------------------------------------- */
+/* ESTILO GERAL DOS CARDS (50/30/20) */
+/* -------------------------------------- */
+.card {
+  flex: 1 1 300px; /* Cresce e encolhe, com base de 300px */
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 25px;
+  text-align: left;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.header-card {
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+  letter-spacing: 0.5px;
+  opacity: 0.7;
+}
+
+.value-card {
+  font-size: 1.6rem;
+  font-weight: 800;
+  margin-bottom: 15px;
+}
+
+.card h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-top: 5px;
+  display: inline-block; /* Para ficar ao lado do ícone/emoji */
+  vertical-align: top;
+  margin-left: 8px;
+}
+
+.card p {
+  font-size: 0.9rem;
+  color: #777;
+  margin-top: 10px;
+  line-height: 1.4;
+}
+
+/* Estilo do ícone/emoji */
+.card .icon {
+    font-size: 1.2rem;
+    vertical-align: top;
+}
+
+/* -------------------------------------- */
+/* CORES ESPECÍFICAS DOS CARDS */
+/* -------------------------------------- */
+.card.red { border-top: 5px solid #ef5350; }
+.card.yellow { border-top: 5px solid #ffca28; }
+.card.green { border-top: 5px solid #66bb6a; }
+
+.red-text { color: #ef5350; }
+.yellow-text { color: #ffca28; }
+.green-text { color: #66bb6a; }
+
+/* -------------------------------------- */
+/* RESPONSIVIDADE (PARA TELAS PEQUENAS) */
+/* -------------------------------------- */
+@media (max-width: 900px) {
+  .allocation-cards-container {
+    flex-direction: column;
+    align-items: center;
+  }
+  .card {
+    flex: 1 1 90%;
+    max-width: 400px;
+  }
+}
+
+@media (max-width: 500px) {
+    .magic-budget-section {
+        padding: 10px;
+    }
+    .value-card {
+        font-size: 1.4rem;
+    }
+    .input-value-display {
+        font-size: 2rem;
+    }
+}

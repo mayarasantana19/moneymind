@@ -1,0 +1,32 @@
+<header class="header">
+  <div class="header-container">
+    <a routerLink="/painel" class="logo">Money<strong>Mind</strong></a>
+
+    <button class="menu-toggle" (click)="toggleMenu()">
+      <i class="bi" [class.bi-x]="isMenuOpen" [class.bi-list]="!isMenuOpen"></i>
+    </button>
+
+    <nav class="nav" [class.open]="isMenuOpen">
+      <ul>
+        <ng-container *ngIf="isLoggedIn()">
+          <li><a routerLink="/painel" routerLinkActive="active" (click)="toggleMenu()">Início</a></li>
+          <li><a routerLink="/controle-gastos" routerLinkActive="active" (click)="toggleMenu()">Controle de Gastos</a>
+          </li>
+          <li><a routerLink="/aprender" routerLinkActive="active" (click)="toggleMenu()">Aprender</a></li>
+          <li><a routerLink="/calculadora" routerLinkActive="active" (click)="toggleMenu()">Calculadora</a></li>
+          <li><a routerLink="/sobre-nos" routerLinkActive="active" (click)="toggleMenu()">Sobre Nós</a></li>
+
+          <li>
+            <button class="nav-button-icon" (click)="logout(); toggleMenu()">
+              <i class="bi bi-box-arrow-right"></i>
+            </button>
+          </li>
+        </ng-container>
+
+        <li><a routerLink="/cadastro" routerLinkActive="active" (click)="toggleMenu()">Cadastrar</a></li>
+        <li><a routerLink="/login" routerLinkActive="active" (click)="toggleMenu()">Logar</a></li>
+        <li><a routerLink="/sobre-nos" routerLinkActive="active" (click)="toggleMenu()">Sobre Nós</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>

@@ -1,0 +1,63 @@
+<section class="magic-budget-section">
+  <h2>Método 50/30/20: Orçamento Mágico</h2>
+  <p>Insira sua renda líquida mensal e veja como o "Orçamento Mágico" divide seu dinheiro automaticamente.</p>
+
+  <div class="input-box">
+    <!-- Rótulo do campo -->
+    <label for="renda">Sua Renda Mensal Líquida (R$):</label>
+    
+    <!-- DISPLAY GRANDE DE VALOR (VISÍVEL) -->
+    <!-- FIX: Chamar a signal rendaMensal() para obter o valor que o pipe espera. -->
+    <div class="input-value-display">
+      {{ rendaMensal() | currency:'BRL':'symbol':'1.2-2' }}
+    </div>
+
+    <!-- INPUT INVISÍVEL E CLICÁVEL (FUNCIONAL) -->
+    <!-- Este input fica por cima do display e é onde a digitação real acontece -->
+    <input 
+      id="renda" 
+      type="number" 
+      [(ngModel)]="rendaMensal" 
+      min="0"
+      placeholder="0"
+    >
+  </div>
+
+  <div class="allocation-cards-container">
+    <!-- Card 50% - Necessidades Essenciais -->
+    <div class="card red">
+      <div class="header-card">LIMITE MÁXIMO (50%)</div>
+      <!-- O resultado do computed signal (necessidadesValor) já é chamado como função -->
+      <div class="value-card red-text">
+        {{ necessidadesValor() | currency:'BRL':'symbol':'1.2-2' }}
+      </div>
+      <span class="icon">🏠</span>
+      <h3>Necessidades Essenciais</h3>
+      <p>Aluguel, contas fixas, alimentação básica, transporte. Não deve ser ultrapassado.</p>
+    </div>
+
+    <!-- Card 30% - Desejos Pessoais -->
+    <div class="card yellow">
+      <div class="header-card">MARGEM DE GASTO (30%)</div>
+      <!-- O resultado do computed signal (desejosValor) já é chamado como função -->
+      <div class="value-card yellow-text">
+        {{ desejosValor() | currency:'BRL':'symbol':'1.2-2' }}
+      </div>
+      <span class="icon">🛍️</span>
+      <h3>Desejos Pessoais</h3>
+      <p>Lazer, entretenimento, jantares fora, compras não essenciais.</p>
+    </div>
+
+    <!-- Card 20% - Metas Financeiras -->
+    <div class="card green">
+      <div class="header-card">FOCO NO FUTURO (20%)</div>
+      <!-- O resultado do computed signal (metasValor) já é chamado como função -->
+      <div class="value-card green-text">
+        {{ metasValor() | currency:'BRL':'symbol':'1.2-2' }}
+      </div>
+      <span class="icon">💰</span>
+      <h3>Metas Financeiras</h3>
+      <p>Reserva de Emergência, pagamento de dívidas e investimentos de longo prazo.</p>
+    </div>
+  </div>
+</section>

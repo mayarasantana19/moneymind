@@ -1,0 +1,846 @@
+
+// =======================================================
+// FIREBASE E CONFIGURAÇÃO DE DADOS PERSISTENTES
+// =======================================================
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+import {
+    getFirestore,
+    doc,
+    setDoc,
+    onSnapshot,
+    serverTimestamp,
+    setLogLevel
+} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+// Variáveis globais para Firebase e App
+let app, db, auth;
+let userId = 'default-user'; // Será atualizado após a autenticação
+const DB_COLLECTION = 'user_finances'; // Nome da sua coleção
+
+// Dados padrão (usados antes de carregar ou se o DB estiver vazio)
+const DEFAULT_EXPENSES = [
+    { name: 'Aluguel/Moradia', amount: 800 },
+    { name: 'Alimentação', amount: 500 },
+    { name: 'Transporte', amount: 200 },
+    { name: 'Lazer', amount: 150 },
+    { name: 'Investimentos', amount: 300 }
+];
+
+// Estado do aplicativo (será preenchido pelo Firestore)
+let dashboardIncome = 3000;
+let expenseCategories = [...DEFAULT_EXPENSES];
+
+// Estado do perfil do usuário
+let userName = 'Usuário'; // Valor padrão
+let userAge = 0;
+let initialSetupComplete = false;
+
+// Exibir mensagem de status
+function showStatus(message, duration = 1500) {
+    const statusEl = document.getElementById('statusMessage');
+    statusEl.textContent = message;
+    statusEl.classList.add('visible');
+    setTimeout(() => {
+        statusEl.classList.remove('visible');
+    }, duration);
+}
+
+// Funções para controle do Modal de Perfil
+function showProfileModal() {
+    const modal = document.getElementById('profileSetupModal');
+    if (modal) modal.classList.remove('hidden');
+}
+
+function hideProfileModal() {
+    const modal = document.getElementById('profileSetupModal');
+    if (modal) modal.classList.add('hidden');
+}
+
+
+/**
+ * Inicializa o Firebase, autentica o usuário e configura o listener do Firestore.
+ */
+async function initializeFirebase() {
+    try {
+        // Configuração e inicialização
+        setLogLevel('debug');
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        app = initializeApp(firebaseConfig);
+        db = getFirestore(app);
+        auth = getAuth(app);
+
+        // Autenticação
+        const authToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : '';
+
+        if (authToken) {
+            await signInWithCustomToken(auth, authToken);
+        } else {
+            await signInAnonymously(auth);
+        }
+
+        // Esperar o estado de autenticação mudar
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                userId = user.uid;
+                document.getElementById('userIdDisplay').textContent = `ID do Usuário: ${userId}`;
+                setupFirestoreListener(appId);
+                console.log("Firebase: Usuário autenticado e listener do DB iniciado.");
+
+            } else {
+                console.error("Firebase: Falha na autenticação. Usando dados padrão.");
+                // Se a autenticação falhar, usa os valores padrão e força o modal
+                userName = 'Usuário';
+                userAge = 0;
+                dashboardIncome = 3000;
+                document.getElementById('welcomeGreeting').textContent = `Olá, ${userName}!`;
+                renderExpenseInputs();
+                updateDashboard();
+                showProfileModal();
+                showStatus("Modo offline. Dados não serão salvos.", 3000);
+            }
+        });
+
+    } catch (error) {
+        console.error("Erro na inicialização do Firebase:", error);
+        // Em caso de erro grave, usa dados padrão e força o modal
+        userName = 'Usuário';
+        userAge = 0;
+        dashboardIncome = 3000;
+        document.getElementById('welcomeGreeting').textContent = `Olá, ${userName}!`;
+        renderExpenseInputs();
+        updateDashboard();
+        showProfileModal();
+        showStatus("Erro ao conectar ao servidor. Usando dados padrão.", 4000);
+    }
+}
+
+/**
+ * Configura o listener em tempo real para carregar os dados financeiros do usuário.
+ */
+function setupFirestoreListener(appId) {
+    // Caminho do documento privado: /artifacts/{appId}/users/{userId}/{seu_collection_name}/{documentId}
+    const docRef = doc(db, `artifacts/${appId}/users/${userId}/${DB_COLLECTION}/data`);
+
+    onSnapshot(docRef, (docSnap) => {
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+            console.log("Firestore: Dados carregados em tempo real.", data);
+
+            // 1. Carregar dados do perfil
+            userName = data.userName || 'Usuário';
+            userAge = data.userAge || 0;
+            initialSetupComplete = data.initialSetupComplete || false;
+
+            // 2. Carrega Renda
+            dashboardIncome = data.income || 3000;
+            document.getElementById('dashboardIncome').value = dashboardIncome;
+
+            // 3. Carrega Gastos (garantindo que seja um array)
+            try {
+                if (data.expensesJson) {
+                    expenseCategories = JSON.parse(data.expensesJson);
+                } else {
+                    expenseCategories = [...DEFAULT_EXPENSES];
+                }
+            } catch (e) {
+                console.error("Erro ao fazer parse dos dados de gastos, usando default.", e);
+                expenseCategories = [...DEFAULT_EXPENSES];
+            }
+
+            // 4. Atualiza UI e verifica modal
+            document.getElementById('welcomeGreeting').textContent = `Olá, ${userName}!`;
+
+            if (!initialSetupComplete) {
+                // Preenche inputs do modal com dados existentes (se houver)
+                document.getElementById('profileName').value = userName !== 'Usuário' ? userName : '';
+                document.getElementById('profileAge').value = userAge || '';
+                document.getElementById('profileIncome').value = dashboardIncome || 3000;
+                showProfileModal();
+            } else {
+                hideProfileModal();
+            }
+
+            // Renderiza os inputs e atualiza o dashboard com os novos dados
+            renderExpenseInputs();
+            updateDashboard();
+            showStatus("Dados carregados com sucesso!", 1500);
+
+        } else {
+            // Se o documento não existir (primeiro acesso), força o modal de setup
+            initialSetupComplete = false;
+            userName = 'Usuário';
+            userAge = 0;
+            dashboardIncome = 3000;
+            document.getElementById('welcomeGreeting').textContent = `Olá, ${userName}!`;
+            renderExpenseInputs();
+            updateDashboard();
+            showProfileModal();
+        }
+    }, (error) => {
+        console.error("Erro ao receber dados do Firestore:", error);
+        showStatus("Erro de conexão com o Banco de Dados.", 3000);
+        updateDashboard();
+    });
+}
+
+/**
+ * Salva a renda, as categorias de gastos e o perfil do usuário no Firestore.
+ */
+async function saveFinanceData() {
+    if (!db || !userId) {
+        console.error("DB ou UserId não está pronto para salvar.");
+        return;
+    }
+
+    // Garante que a renda seja um número
+    const incomeValue = parseFloat(document.getElementById('dashboardIncome').value) || 0;
+
+    // Constrói o objeto de dados a serem salvos
+    const dataToSave = {
+        // Dados Financeiros
+        income: incomeValue,
+        expensesJson: JSON.stringify(expenseCategories),
+        updatedAt: serverTimestamp(),
+
+        // Dados do Perfil
+        userName: userName,
+        userAge: userAge,
+        initialSetupComplete: initialSetupComplete
+    };
+
+    try {
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const docRef = doc(db, `artifacts/${appId}/users/${userId}/${DB_COLLECTION}/data`);
+
+        await setDoc(docRef, dataToSave, { merge: true });
+        console.log("Dados salvos com sucesso!");
+    } catch (error) {
+        console.error("Erro ao salvar dados no Firestore:", error);
+        showStatus("Erro ao salvar dados.", 2000);
+    }
+}
+
+/**
+ * Lida com a submissão do formulário de perfil inicial.
+ */
+function submitProfileForm(event) {
+    event.preventDefault();
+
+    const nameInput = document.getElementById('profileName').value.trim();
+    const ageInput = parseInt(document.getElementById('profileAge').value);
+    const incomeInput = parseFloat(document.getElementById('profileIncome').value);
+
+    // Validação básica
+    if (!nameInput || isNaN(ageInput) || isNaN(incomeInput) || ageInput < 16 || incomeInput < 0) {
+        showStatus("Por favor, preencha todos os campos corretamente.", 3000);
+        return;
+    }
+
+    // Atualiza o estado global
+    userName = nameInput;
+    userAge = ageInput;
+    dashboardIncome = incomeInput; // Define a renda inicial
+    initialSetupComplete = true;
+
+    // Atualiza a UI imediatamente
+    document.getElementById('welcomeGreeting').textContent = `Olá, ${userName}!`;
+    document.getElementById('monthlyIncome').value = incomeInput; // Home 50/30/20
+    document.getElementById('dashboardIncome').value = incomeInput; // Dashboard
+
+    calculate503020(); // Recalcula a home
+    updateDashboard(); // Recalcula o dashboard
+
+    // Salva e fecha o modal
+    saveFinanceData();
+    hideProfileModal();
+    showStatus(`Bem-vindo, ${userName}! Seu perfil foi salvo.`, 2500);
+}
+
+
+// =======================================================
+// FUNÇÕES GERAIS DE FORMATAÇÃO E CÁLCULO
+// =======================================================
+
+// Função para formatar números como moeda brasileira (Real)
+const formatCurrency = (value) => {
+    return new Intl.NumberFormat('pt-BR', {
+        style: 'currency',
+        currency: 'BRL',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    }).format(value);
+};
+
+// =======================================================
+// FUNÇÕES DE ROTEAMENTO (Simulação de Múltiplas Páginas)
+// =======================================================
+
+// Variável global para armazenar a instância do gráfico
+let expensesChartInstance = null;
+
+// Cores de Gastos (para o gráfico) - Paleta amigável e acessível
+const CHART_COLORS = [
+    '#F4A261', // Laranja (CTA)
+    '#0A477A', // Azul (Mind Blue)
+    '#6AA84F', // Verde (Growth Green)
+    '#8B5CF6', // Violeta
+    '#EF4444', // Vermelho
+    '#FBBF24', // Amarelo
+    '#10B981', // Verde Água
+    '#3B82F6', // Azul Claro
+];
+
+// Estado da aba atual da calculadora
+let currentCalculatorTab = 'jurosCompostos';
+
+/**
+ * Alterna a visibilidade das seções (páginas) e atualiza o link ativo.
+ */
+window.showPage = function (targetPageId) { // Tornando global para fácil debug e acesso
+    console.log(`[ROTEAMENTO INÍCIO] Tentando navegar para: ${targetPageId}`);
+
+    // 1. Resetar o estado ativo de todos os links de navegação
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active-link', 'text-mind-blue');
+        link.classList.add('text-gray-600');
+    });
+
+    // 2. Esconder todas as páginas de conteúdo
+    document.querySelectorAll('.page-content').forEach(page => {
+        page.classList.add('hidden');
+    });
+
+    // 3. Mostrar a página de destino
+    // CRÍTICO: O seletor é 'page-' + ID
+    const targetPage = document.getElementById(`page-${targetPageId}`);
+    if (targetPage) {
+        // Remove a classe 'hidden' para tornar a página visível (graças ao !important no CSS)
+        targetPage.classList.remove('hidden');
+        window.scrollTo({ top: 0, behavior: 'smooth' }); // Rolar para o topo
+        console.log(`[ROTEAMENTO SUCESSO] Página 'page-${targetPageId}' exibida.`);
+
+        // 4. Ações específicas por página
+        if (targetPageId === 'dashboard') {
+            renderExpenseInputs();
+            updateDashboard();
+        }
+
+        if (targetPageId === 'calculadora') {
+            // Garante que o cálculo correto seja feito ao entrar na página
+            switchCalculatorTab(currentCalculatorTab);
+        }
+    } else {
+        console.error(`[ROTEAMENTO FALHA] Elemento 'page-${targetPageId}' não encontrado no DOM. Verifique o ID.`);
+    }
+
+    // 5. Setar o estado ativo no link correspondente
+    const activeLink = document.querySelector(`.nav-link[data-page="${targetPageId}"]`);
+    if (activeLink) {
+        activeLink.classList.add('active-link', 'text-mind-blue');
+        activeLink.classList.remove('text-gray-600');
+    }
+}
+
+/**
+ * Alterna entre as abas das calculadoras (Juros Compostos e Meta Financeira).
+ */
+window.switchCalculatorTab = function (tabName) {
+    currentCalculatorTab = tabName;
+
+    // Esconder todos os conteúdos e desativar todos os botões
+    document.querySelectorAll('.calculator-content').forEach(content => {
+        content.classList.add('hidden');
+    });
+    document.querySelectorAll('.tab-button').forEach(button => {
+        button.classList.remove('active-tab', 'text-white', 'bg-mind-blue');
+        button.classList.add('bg-white', 'text-mind-blue', 'border', 'border-mind-blue/50', 'hover:bg-mind-blue/10');
+    });
+
+    // Mostrar o conteúdo e ativar o botão correto
+    const targetContent = document.getElementById(`${tabName}Content`);
+    const targetButton = document.querySelector(`.tab-button[data-calc="${tabName}"]`);
+
+    if (targetContent) targetContent.classList.remove('hidden');
+    if (targetButton) {
+        targetButton.classList.add('active-tab', 'text-white', 'bg-mind-blue');
+        targetButton.classList.remove('bg-white', 'text-mind-blue', 'border', 'border-mind-blue/50', 'hover:bg-mind-blue/10');
+    }
+
+    // Rodar o cálculo inicial da aba ativa
+    if (tabName === 'jurosCompostos') {
+        calculateCompoundInterest();
+    } else if (tabName === 'metaFinanceira') {
+        calculateGoalContribution();
+    }
+}
+
+/**
+ * Configura os listeners para os botões de navegação e CTAs internos.
+ */
+function setupRouting() {
+    console.log("[ROTEAMENTO CONFIGURAÇÃO] Configurando listeners de navegação.");
+
+    // Listeners para a Navegação Principal (Header)
+    const navButtons = document.querySelectorAll('.nav-link');
+    navButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetPage = e.currentTarget.getAttribute('data-page');
+            console.log(`[NAVEGAÇÃO CLIQUE] Botão clicado: ${targetPage}`);
+            showPage(targetPage);
+        });
+    });
+    console.log(`[NAVEGAÇÃO] ${navButtons.length} links principais configurados.`);
+
+
+    // Listeners para CTAs Internos
+    const ctaLinks = document.querySelectorAll('.cta-link');
+    ctaLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetPage = e.currentTarget.getAttribute('data-page-target');
+            if (targetPage) {
+                console.log(`[CTA CLIQUE] Link clicado: ${targetPage}`);
+                showPage(targetPage);
+            }
+        });
+    });
+    console.log(`[NAVEGAÇÃO] ${ctaLinks.length} CTAs internos configurados.`);
+
+    // Inicializa mostrando a página inicial
+    showPage('home');
+    console.log("[ROTEAMENTO CONFIGURAÇÃO] Concluído. Página inicial ('home') exibida.");
+}
+
+// =======================================================
+// FUNÇÕES DO CÁLCULO 50/30/20 (HOME PAGE)
+// =======================================================
+
+/**
+ * Calcula e exibe a distribuição 50/30/20 com base na renda mensal.
+ */
+function calculate503020() {
+    const incomeInput = document.getElementById('monthlyIncome');
+    const income = parseFloat(incomeInput ? incomeInput.value : 0) || 0;
+
+    const needs = income * 0.50;
+    const wants = income * 0.30;
+    const goals = income * 0.20;
+
+    // Atualiza os elementos de resultado
+    const needsElement = document.getElementById('needsAmount');
+    const wantsElement = document.getElementById('wantsAmount');
+    const goalsElement = document.getElementById('goalsAmount');
+
+    if (needsElement) needsElement.textContent = formatCurrency(needs);
+    if (wantsElement) wantsElement.textContent = formatCurrency(wants);
+    if (goalsElement) goalsElement.textContent = formatCurrency(goals);
+}
+
+// =======================================================
+// FUNÇÕES DO DASHBOARD DE CONTROLE (PÁGINA NOVA)
+// =======================================================
+
+/**
+ * Atualiza a renda no estado e salva no Firestore.
+ */
+window.handleIncomeChange = function (value) { // Tornando global para oninput
+    dashboardIncome = parseFloat(value) || 0;
+    // Salva a alteração no DB imediatamente
+    saveFinanceData();
+    // Atualiza o dashboard na UI
+    updateDashboard();
+}
+
+/**
+ * Cria os campos de input para as categorias de gastos usando o estado 'expenseCategories'.
+ */
+function renderExpenseInputs() {
+    const container = document.getElementById('expenseInputs');
+    if (!container) return;
+
+    container.innerHTML = '';
+
+    expenseCategories.forEach((cat, index) => {
+        const div = document.createElement('div');
+        div.className = 'flex items-center space-x-2';
+
+        div.innerHTML = `
+                    <label for="expense_${index}" class="w-1/3 text-sm font-medium text-gray-700">${cat.name}:</label>
+                    <input type="number" id="expense_${index}" data-category-index="${index}" value="${cat.amount}" min="0" 
+                        class="w-2/3 p-2 border border-gray-300 rounded-md text-sm text-right focus:border-mind-blue focus:ring-mind-blue" 
+                        oninput="handleExpenseChange(this)">
+                `;
+        container.appendChild(div);
+    });
+
+    const addBtn = document.getElementById('addCategoryBtn');
+    if (addBtn) {
+        addBtn.onclick = () => {
+            console.warn("Funcionalidade de adicionar categoria personalizada não está ativa nesta demonstração.");
+        };
+    }
+}
+
+/**
+ * Atualiza o array de gastos globais, salva no Firestore e recalcula o dashboard.
+ */
+window.handleExpenseChange = function (input) { // Tornando global para oninput
+    const index = parseInt(input.getAttribute('data-category-index'));
+    const newAmount = parseFloat(input.value) || 0;
+
+    if (index >= 0 && index < expenseCategories.length) {
+        expenseCategories[index].amount = newAmount;
+    }
+    // Salva a alteração no DB imediatamente
+    saveFinanceData();
+    // Atualiza o dashboard na UI
+    updateDashboard();
+}
+
+/**
+ * Calcula e renderiza o gráfico e a tabela de resumo.
+ */
+function updateDashboard() {
+    const income = dashboardIncome;
+
+    // 1. Garante que o input da renda reflita o estado atual
+    const incomeInput = document.getElementById('dashboardIncome');
+    if (incomeInput) incomeInput.value = income;
+
+
+    const totalExpenses = expenseCategories.reduce((sum, cat) => sum + cat.amount, 0);
+    const balance = income - totalExpenses;
+
+    // 2. Atualizar Tabela de Resumo
+    document.getElementById('tableIncome').textContent = formatCurrency(income);
+    document.getElementById('tableTotalExpenses').textContent = formatCurrency(totalExpenses);
+
+    const balanceElement = document.getElementById('tableBalance');
+    balanceElement.textContent = formatCurrency(balance);
+
+    // Cores e texto para o saldo
+    if (balance >= 0) {
+        balanceElement.classList.remove('text-red-500');
+        balanceElement.classList.add('text-growth-green');
+    } else {
+        balanceElement.classList.remove('text-growth-green');
+        balanceElement.classList.add('text-red-500');
+    }
+
+    // 3. Atualizar Tabela de Detalhes
+    const detailTableBody = document.getElementById('expenseDetailTable');
+    detailTableBody.innerHTML = '';
+
+    expenseCategories
+        .filter(cat => cat.amount > 0) // Mostra apenas categorias com valor
+        .forEach((cat) => {
+            const row = detailTableBody.insertRow();
+            row.innerHTML = `
+                        <td class="px-3 py-2 whitespace-nowrap text-gray-700">${cat.name}</td>
+                        <td class="px-3 py-2 whitespace-nowrap text-right">${formatCurrency(cat.amount)}</td>
+                    `;
+        });
+
+    // 4. Atualizar Gráfico (Chart.js)
+    const expenseData = expenseCategories.map(cat => cat.amount);
+    const expenseLabels = expenseCategories.map(cat => cat.name);
+
+    // Se o gráfico já existe, destrua-o antes de criar um novo
+    if (expensesChartInstance) {
+        expensesChartInstance.destroy();
+    }
+
+    const ctx = document.getElementById('expensesChart').getContext('2d');
+    expensesChartInstance = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: expenseLabels,
+            datasets: [{
+                data: expenseData,
+                backgroundColor: CHART_COLORS,
+                hoverOffset: 16,
+                borderColor: '#ffffff',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: {
+                        padding: 20,
+                        font: {
+                            size: 14
+                        }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            const label = context.label || '';
+                            if (label) {
+                                let sum = 0;
+                                let dataArr = context.chart.data.datasets[0].data;
+                                dataArr.map(data => {
+                                    sum += data;
+                                });
+                                const percentage = ((context.parsed / sum) * 100).toFixed(1) + '%';
+                                return `${label}: ${formatCurrency(context.parsed)} (${percentage})`;
+                            }
+                            return label;
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Atualiza a calculadora 50/30/20 na Home
+    calculate503020();
+}
+
+// =======================================================
+// FUNÇÕES DA CALCULADORA 1: JUROS COMPOSTOS (Simulador de Crescimento)
+// =======================================================
+
+// Referências aos elementos de input e output da CALCULADORA DE JUROS COMPOSTOS
+const inputsCalc = {
+    capital: () => document.getElementById('initialCapital'),
+    contribution: () => document.getElementById('monthlyContribution'),
+    rate: () => document.getElementById('annualRate'),
+    time: () => document.getElementById('timeInYears')
+};
+
+const valuesCalc = {
+    capital: () => document.getElementById('initialCapitalValue'),
+    contribution: () => document.getElementById('monthlyContributionValue'),
+    rate: () => document.getElementById('annualRateValue'),
+    time: () => document.getElementById('timeInYearsValue')
+};
+
+const outputsCalc = {
+    finalAmount: () => document.getElementById('finalAmount'),
+    totalInvested: () => document.getElementById('totalInvested'),
+    totalInterest: () => document.getElementById('totalInterest'),
+    message: () => document.getElementById('calculatorMessage')
+};
+
+/**
+ * Calcula o montante final usando a fórmula dos Juros Compostos com Aportes Mensais.
+ */
+function calculateCompoundInterest() {
+    // Coletar valores dos inputs
+    const P = parseFloat(inputsCalc.capital()?.value || 0) || 0;
+    const A = parseFloat(inputsCalc.contribution()?.value || 0) || 0;
+    const annualRate = parseFloat(inputsCalc.rate()?.value || 0) / 100 || 0;
+    const T = parseInt(inputsCalc.time()?.value || 0) || 0;
+
+    // Converter taxa e tempo para o período mensal
+    const i = annualRate / 12; // Taxa Mensal
+    const n = T * 12; // Período em Meses
+
+    let M = 0; // Montante Final
+
+    // 1. Cálculo do crescimento do Capital Inicial
+    const futureValueOfPrincipal = P * Math.pow(1 + i, n);
+
+    // 2. Cálculo do crescimento da série de Aportes (Future Value of an Annuity Due)
+    let futureValueOfContributions = 0;
+    if (A > 0 && i > 0) {
+        const geometricSeries = (Math.pow(1 + i, n) - 1) / i;
+        // Fórmula de anualidade antecipada (aportes no início do período)
+        futureValueOfContributions = A * (1 + i) * geometricSeries;
+    } else if (A > 0 && i === 0) {
+        // Caso especial: juros zero
+        futureValueOfContributions = A * n;
+    }
+
+    M = futureValueOfPrincipal + futureValueOfContributions;
+
+    // 3. Cálculo dos Totais
+    const totalInvested = P + (A * n);
+    const totalInterest = M - totalInvested;
+
+    // 4. Atualizar o DOM com os resultados
+    if (outputsCalc.finalAmount()) outputsCalc.finalAmount().textContent = formatCurrency(M);
+    if (outputsCalc.totalInvested()) outputsCalc.totalInvested().textContent = formatCurrency(totalInvested);
+    if (outputsCalc.totalInterest()) outputsCalc.totalInterest().textContent = formatCurrency(totalInterest);
+
+    // 5. Exibir mensagem de feedback
+    const messageEl = outputsCalc.message();
+    if (messageEl) {
+        if (M > totalInvested && T > 0) {
+            messageEl.textContent = `Em ${T} anos, você transformará R$ ${formatCurrency(totalInvested).replace('R$', '').trim()} (investido) em ${formatCurrency(M).replace("R$", "").trim()} (montante final).`;
+            messageEl.classList.remove('hidden');
+        } else {
+            messageEl.classList.add('hidden');
+        }
+    }
+
+
+    // Atualizar os displays dos valores do slider
+    if (valuesCalc.capital()) valuesCalc.capital().textContent = formatCurrency(P).replace(",00", "");
+    if (valuesCalc.contribution()) valuesCalc.contribution().textContent = formatCurrency(A).replace(",00", "");
+    if (valuesCalc.rate()) valuesCalc.rate().textContent = `${(annualRate * 100).toFixed(1)}%`;
+    if (valuesCalc.time()) valuesCalc.time().textContent = `${T} anos`;
+}
+
+// =======================================================
+// FUNÇÕES DA CALCULADORA 2: META FINANCEIRA (Simulador de Aporte Necessário)
+// =======================================================
+
+// Referências aos elementos de input e output da CALCULADORA DE META
+const inputsGoalCalc = {
+    target: () => document.getElementById('targetAmount'),
+    capital: () => document.getElementById('initialCapitalGoal'),
+    rate: () => document.getElementById('annualRateGoal'),
+    time: () => document.getElementById('timeInYearsGoal')
+};
+
+const valuesGoalCalc = {
+    target: () => document.getElementById('targetAmountValue'),
+    capital: () => document.getElementById('initialCapitalGoalValue'),
+    rate: () => document.getElementById('annualRateGoalValue'),
+    time: () => document.getElementById('timeInYearsGoalValue')
+};
+
+const outputsGoalCalc = {
+    requiredContribution: () => document.getElementById('requiredContribution'),
+    totalContributionNeeded: () => document.getElementById('totalContributionNeeded'),
+    interestGoal: () => document.getElementById('interestGoal'),
+    message: () => document.getElementById('goalMessage')
+};
+
+/**
+ * Calcula o Aporte Mensal necessário para atingir uma Meta Financeira.
+ */
+function calculateGoalContribution() {
+    // Coletar valores dos inputs
+    const FV = parseFloat(inputsGoalCalc.target()?.value || 0) || 0; // Future Value (Meta)
+    const P = parseFloat(inputsGoalCalc.capital()?.value || 0) || 0; // Principal (Capital Inicial)
+    const annualRate = parseFloat(inputsGoalCalc.rate()?.value || 0) / 100 || 0;
+    const T = parseInt(inputsGoalCalc.time()?.value || 0) || 0; // Tempo em Anos
+
+    // Converter taxa e tempo para o período mensal
+    const i = annualRate / 12; // Taxa Mensal
+    const n = T * 12; // Período em Meses
+
+    let A = 0; // Aporte Mensal (Resultado)
+    let totalAportado = 0;
+    let jurosGanhos = 0;
+
+    if (T === 0 || FV === 0) {
+        A = 0;
+    } else if (i === 0) {
+        // Caso especial: Juros Zero
+        const amountToCover = FV - P;
+        A = amountToCover > 0 ? amountToCover / n : 0;
+        jurosGanhos = 0;
+    } else {
+        // Valor futuro que o Capital Inicial sozinho irá gerar
+        const futureValueOfPrincipal = P * Math.pow(1 + i, n);
+
+        // Valor restante que o Aporte Mensal precisa cobrir
+        const FV_net = FV - futureValueOfPrincipal;
+
+        if (FV_net <= 0) {
+            // O capital inicial já cobre ou ultrapassa a meta
+            A = 0;
+            totalAportado = 0;
+            jurosGanhos = FV - P; // Juros/Rendimento do Capital Inicial
+        } else {
+            // Fator de crescimento da série de Aportes (Future Value of an Annuity Due Factor)
+            const geometricSeries = (Math.pow(1 + i, n) - 1) / i;
+            const S = (1 + i) * geometricSeries; // Fator de anualidade antecipada (aportes no início do período)
+
+            // Cálculo do Aporte Mensal necessário
+            A = FV_net / S;
+
+            // Cálculo dos Totais
+            totalAportado = A * n;
+            jurosGanhos = FV - P - totalAportado;
+        }
+    }
+
+    // 4. Atualizar o DOM com os resultados
+    if (outputsGoalCalc.requiredContribution()) outputsGoalCalc.requiredContribution().textContent = formatCurrency(Math.max(0, A));
+    if (outputsGoalCalc.totalContributionNeeded()) outputsGoalCalc.totalContributionNeeded().textContent = formatCurrency(Math.max(0, totalAportado));
+    if (outputsGoalCalc.interestGoal()) outputsGoalCalc.interestGoal().textContent = formatCurrency(Math.max(0, jurosGanhos));
+
+    // 5. Exibir mensagem de feedback
+    const goalMessageEl = outputsGoalCalc.message();
+    if (goalMessageEl) {
+        if (FV > 0 && T > 0) {
+            if (P >= FV) {
+                goalMessageEl.textContent = `Sua meta já foi atingida (ou será). O Capital Inicial é suficiente!`;
+            } else {
+                goalMessageEl.textContent = `Aportando ${formatCurrency(Math.max(0, A))} por mês, você atinge R$ ${formatCurrency(FV).replace('R$', '').trim()} em ${T} anos.`;
+            }
+            goalMessageEl.classList.remove('hidden');
+        } else {
+            goalMessageEl.classList.add('hidden');
+        }
+    }
+
+
+    // Atualizar os displays dos valores do slider
+    if (valuesGoalCalc.target()) valuesGoalCalc.target().textContent = formatCurrency(FV).replace(",00", "");
+    if (valuesGoalCalc.capital()) valuesGoalCalc.capital().textContent = formatCurrency(P).replace(",00", "");
+    if (valuesGoalCalc.rate()) valuesGoalCalc.rate().textContent = `${(annualRate * 100).toFixed(1)}%`;
+    if (valuesGoalCalc.time()) valuesGoalCalc.time().textContent = `${T} anos`;
+}
+
+/**
+ * Adiciona listeners a todos os inputs para recalcular ao mudar.
+ */
+function setupListeners() {
+    // Setup Listeners da Calculadora de Juros Compostos
+    for (const key in inputsCalc) {
+        const inputEl = inputsCalc[key]();
+        if (inputEl) {
+            inputEl.addEventListener('input', calculateCompoundInterest);
+        }
+    }
+
+    // Setup Listeners da Calculadora de Meta Financeira
+    for (const key in inputsGoalCalc) {
+        const inputEl = inputsGoalCalc[key]();
+        if (inputEl) {
+            inputEl.addEventListener('input', calculateGoalContribution);
+        }
+    }
+
+    // Setup Listener da Calculadora 50/30/20 (na Home Page)
+    const incomeHomeInput = document.getElementById('monthlyIncome');
+    if (incomeHomeInput) {
+        incomeHomeInput.addEventListener('input', calculate503020);
+        calculate503020(); // Cálculo inicial
+    }
+
+    // NOVO: Listener do Formulário de Perfil
+    const profileForm = document.getElementById('profileForm');
+    if (profileForm) {
+        profileForm.addEventListener('submit', submitProfileForm);
+    }
+
+    // Inicia o roteamento
+    setupRouting();
+}
+
+// Iniciar o aplicativo: 1. Inicia o Firebase, que por sua vez, carrega os dados
+// 2. O carregamento de dados checa o perfil, mostra o modal se necessário, e chama updateDashboard e renderExpenseInputs.
+window.onload = () => {
+    // 1. Configura os listeners de navegação E CALCULADORAS
+    setupListeners();
+
+    // 2. Inicializa o Firebase (ele cuida do resto do estado e autenticação)
+    initializeFirebase();
+
+    // 3. Garante que a aba da calculadora correta seja iniciada (caso a primeira página seja a calculadora)
+    switchCalculatorTab(currentCalculatorTab);
+};
