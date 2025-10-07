@@ -4,13 +4,13 @@
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background: linear-gradient(to right, #007bff, #28a745); 
+    background: linear-gradient(to right, #007bff, #28a745);
     font-family: "Poppins", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     padding: 20px;
-  }
-  
-  /* Cartão principal */
-  .register-card {
+}
+
+/* Cartão principal */
+.register-card {
     background: #ffffff;
     border-radius: 16px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
@@ -19,48 +19,55 @@
     max-width: 450px;
     text-align: center;
     animation: fadeIn 0.6s ease-out;
-  }
-  
-  /* Título */
-  .register-card h1 {
+}
+
+/* Título */
+.register-card h1 {
     color: #333;
     font-size: 1.8rem;
-    margin-bottom: 25px;
-  }
-  
-  /* Formulário */
-  form {
+    margin-bottom: 30px;
+}
+
+/* Formulário */
+form {
     display: flex;
     flex-direction: column;
-    gap: 18px;
-  }
-  
-  /* Labels */
-  label {
+    gap: 20px; /* maior espaçamento entre os campos */
+}
+
+/* Form group para organizar melhor os campos */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px; /* espaçamento entre label e input */
+}
+
+/* Labels */
+label {
     font-weight: 600;
     font-size: 0.95rem;
     text-align: left;
     color: #555;
-  }
-  
-  /* Inputs */
-  input {
-    padding: 12px;
+}
+
+/* Inputs */
+input {
+    padding: 14px;
     border-radius: 8px;
     border: 1.5px solid #ccc;
     transition: all 0.3s ease;
     font-size: 1rem;
     outline: none;
-  }
-  
-  input:focus {
+}
+
+input:focus {
     border-color: #007bff;
     box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
-  }
-  
-  /* Botão */
-  button {
-    padding: 12px;
+}
+
+/* Botão */
+button {
+    padding: 14px;
     border: none;
     border-radius: 8px;
     background-color: #007bff;
@@ -69,82 +76,81 @@
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-  }
-  
-  button:hover {
+    margin-top: 5px;
+}
+
+button:hover {
     background-color: #0056b3;
     transform: translateY(-1px);
-  }
-  
-  button:active {
+}
+
+button:active {
     transform: translateY(1px);
-  }
-  
-  /* Mensagem de erro */
-  .error-message {
+}
+
+/* Mensagem de erro */
+.error-message {
     color: #e63946;
     font-size: 0.9rem;
-    margin-top: -10px;
-  }
-  
-  /* Dica */
-  .hint {
+    margin-top: -5px;
+    text-align: left;
+}
+
+/* Dica */
+.hint {
     margin-top: 25px;
     font-size: 0.9rem;
     color: #666;
     background-color: #f7f7f7;
-    padding: 10px;
+    padding: 12px;
     border-radius: 8px;
-    
-  }
-  
-  /* Link */
-  .link {
+}
+
+/* Link */
+.link {
     color: #007bff;
     font-weight: 600;
     text-decoration: none;
-  }
-  
-  .link:hover {
-    text-decoration: underline;
-  }
+}
 
-  .success-message {
+.link:hover {
+    text-decoration: underline;
+}
+
+.success-message {
     color: #2ecc71;
     font-weight: 600;
     margin-top: 10px;
     animation: fadeIn 0.5s ease-in-out;
-  }
-  
-  
-  /* Animação de entrada */
-  @keyframes fadeIn {
+}
+
+/* Animação de entrada */
+@keyframes fadeIn {
     from {
-      opacity: 0;
-      transform: translateY(25px);
+        opacity: 0;
+        transform: translateY(25px);
     }
     to {
-      opacity: 1;
-      transform: translateY(0);
+        opacity: 1;
+        transform: translateY(0);
     }
-  }
-  
-  /* Responsividade */
-  @media (max-width: 500px) {
+}
+
+/* Responsividade */
+@media (max-width: 500px) {
     .register-card {
-      padding: 30px 20px;
+        padding: 30px 20px;
     }
-  
+
     .register-card h1 {
-      font-size: 1.5rem;
+        font-size: 1.5rem;
     }
-  
+
     input {
-      font-size: 0.95rem;
+        font-size: 0.95rem;
     }
-  
+
     button {
-      font-size: 0.95rem;
+        font-size: 0.95rem;
     }
-  }
-  
+}

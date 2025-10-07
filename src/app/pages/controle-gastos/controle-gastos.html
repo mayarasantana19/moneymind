@@ -1,7 +1,73 @@
-<div class="disabled-container">
-    <div class="message-card">
-      <h1>🚧 Função desativada</h1>
-      <p>Aguarde a próxima atualização para usar esta funcionalidade.</p>
+    <div class="container mx-auto p-4 max-w-lg bg-white shadow-2xl rounded-xl w-full">
+      <h2 class="text-mind-blue text-3xl font-extrabold mb-6 border-b pb-2 rounded-t-lg">
+        💰 Controle de Gastos
+      </h2>
+
+      <!-- Input de Renda -->
+      <div class="renda-input">
+        <label class="font-semibold text-gray-700 block mb-2">Renda Mensal (R$):</label>
+        <input 
+          type="number" 
+          [ngModel]="income()" 
+          (ngModelChange)="onIncomeChange($event)" 
+          class="border border-gray-300 rounded-lg p-3 w-full focus:border-mind-blue focus:ring-1 focus:ring-mind-blue transition duration-150" 
+          placeholder="0.00"
+        />
+      </div>
+
+      <!-- Despesas por Categoria -->
+      <div class="renda-input">
+        <h3 class="font-bold text-lg mb-3">Despesas por Categoria:</h3>
+
+        <!-- Usando @for para melhor desempenho no Angular 17+ -->
+        @for (e of expenses(); track e.category) {
+          <div class="flex items-center justify-between mb-2 gap-4">
+            <span class="truncate text-gray-700">{{ e.category }}</span> <br/>
+            <input 
+              type="number" 
+              [ngModel]="e.amount"
+              (ngModelChange)="onExpenseChange(e, $event)"
+              class="border rounded-lg p-2 w-32 text-right focus:border-mind-blue" 
+              placeholder="0.00"
+            />
+          </div>
+        }
+
+        <button (click)="addCategory()" class="bg-cta-orange hover:bg-cta-orange-dark text-white px-4 py-2 rounded-lg mt-4 shadow-md transition duration-150">
+          + Nova Categoria
+        </button>
+      </div>
+
+      <!-- Resumo Financeiro -->
+      <div class="p-4 bg-gray-50 rounded-lg shadow-sm mb-6">
+        <h3 class="font-bold text-xl text-mind-blue mb-3">Resumo</h3>
+        <p class="text-lg mb-1">
+          💸 Total de Despesas:
+          <strong class="font-extrabold">{{ totalExpenses() | currency:'BRL' }}</strong>
+        </p>
+        <p class="text-lg">
+          💰 Saldo Restante:
+          <strong 
+            class="text-xl font-extrabold" 
+            [ngClass]="balance() >= 0 ? 'text-growth-green' : 'text-negative-red'">
+            {{ balance() | currency:'BRL' }}
+          </strong>
+        </p>
+      </div>
+
+      <!-- Gráfico de Distribuição -->
+      <div class="grafico-container">
+        <h3 class="font-bold text-lg mb-2">📊 Distribuição dos Gastos</h3>
+        <div style="height: 300px; width: 100%;">
+          <!-- Referência do Canvas -->
+          <!--<canvas #expensesCanvas></canvas>-->
+          <h1>🚧 Função desativada</h1>
+          <p>Aguarde a próxima atualização para usar esta funcionalidade.</p>
+        </div>
+      </div>
+
+      <!-- Botão Reset -->
+      <button (click)="resetData()" class="mt-6 bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition duration-150 shadow-sm">
+        🔄 Limpar Dados
+      </button>
     </div>
-</div>
-    
