@@ -23,11 +23,11 @@
         </ng-container>
 
         <li *ngIf="!isLoggedIn()">
-          <a routerLink="/cadastro" (click)="toggleMenu()">Cadastre-se</a>
+          <a routerLink="/login" (click)="toggleMenu()">Login</a>
         </li>
 
         <li *ngIf="!isLoggedIn()">
-          <a routerLink="/login" (click)="toggleMenu()">Login</a>
+          <a routerLink="/cadastro" (click)="toggleMenu()">Cadastre-se</a>
         </li>
 
         <li *ngIf="!isLoggedIn()">

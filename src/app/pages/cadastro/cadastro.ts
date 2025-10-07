@@ -1,12 +1,11 @@
 import { Component } from '@angular/core';
-import { HeaderOutside } from '../../components/header-outside/header-outside';
 import { Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-cadastro',
-  imports: [HeaderOutside, FormsModule],
+  imports: [FormsModule, CommonModule],
   templateUrl: './cadastro.html',
   styleUrl: './cadastro.css'
 })
