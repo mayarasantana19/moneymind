@@ -5,8 +5,6 @@
 ```bash
 npm install
 
-```bash
 npm install bootstrap-icons
 
-```bash
 ng serve
