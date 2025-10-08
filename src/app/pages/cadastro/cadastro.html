@@ -1,77 +1,118 @@
 <div class="register-container">
-    <div class="register-card">
-      <h1>📝 Crie sua conta no MoneyMind</h1>
-  
-      <form (ngSubmit)="onRegister()" autocomplete="off">
-        <div class="form-group">
-          <label for="name">Nome completo</label>
+  <div class="register-card">
+    <h1>📝 Crie sua conta no MoneyMind</h1>
+
+    <form (ngSubmit)="onRegister()" autocomplete="off">
+      <div class="form-group">
+        <label for="name">Nome completo</label>
+        <input
+          type="text"
+          id="name"
+          name="name"
+          [(ngModel)]="name"
+          placeholder="Digite seu nome completo"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="email">E-mail</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          [(ngModel)]="email"
+          placeholder="Digite seu e-mail"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="username">Usuário</label>
+        <input
+          type="text"
+          id="username"
+          name="username"
+          [(ngModel)]="username"
+          placeholder="Crie um nome de usuário"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Senha</label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          [(ngModel)]="password"
+          placeholder="Crie uma senha segura"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="confirmPassword">Confirmar senha</label>
+        <input
+          type="password"
+          id="confirmPassword"
+          name="confirmPassword"
+          [(ngModel)]="confirmPassword"
+          placeholder="Confirme sua senha"
+          required
+        />
+      </div>
+
+      <!-- LGPD -->
+      <div class="form-group lgpd">
+        <label class="checkbox-label">
           <input
-            type="text"
-            id="name"
-            name="name"
-            [(ngModel)]="name"
-            placeholder="Digite seu nome completo"
+            type="checkbox"
+            [(ngModel)]="acceptTerms"
+            name="acceptTerms"
             required
           />
-        </div>
-  
-        <div class="form-group">
-          <label for="email">E-mail</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            [(ngModel)]="email"
-            placeholder="Digite seu e-mail"
-            required
-          />
-        </div>
-  
-        <div class="form-group">
-          <label for="username">Usuário</label>
-          <input
-            type="text"
-            id="username"
-            name="username"
-            [(ngModel)]="username"
-            placeholder="Crie um nome de usuário"
-            required
-          />
-        </div>
-  
-        <div class="form-group">
-          <label for="password">Senha</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            [(ngModel)]="password"
-            placeholder="Crie uma senha segura"
-            required
-          />
-        </div>
-  
-        <div class="form-group">
-          <label for="confirmPassword">Confirmar senha</label>
-          <input
-            type="password"
-            id="confirmPassword"
-            name="confirmPassword"
-            [(ngModel)]="confirmPassword"
-            placeholder="Confirme sua senha"
-            required
-          />
-        </div>
-  
-        <p *ngIf="errorMessage" class="error-message">{{ errorMessage }}</p>
-  
-        <button type="submit">Cadastrar</button>
-      </form>
-  
-      <p class="hint">
-        Já tem uma conta?
-        <a href="/login" routerLink="/login" class="link">Entrar</a>
+          Eu li e aceito os
+          <a href="#" (click)="openModal('terms', $event)">Termos de Uso</a> e a
+          <a href="#" (click)="openModal('privacy', $event)">Política de Privacidade</a>
+          em conformidade com a LGPD.
+        </label>
+      </div>
+
+      <p *ngIf="errorMessage" class="error-message">{{ errorMessage }}</p>
+      <p *ngIf="successMessage" class="success-message">{{ successMessage }}</p>
+
+      <button type="submit">Cadastrar</button>
+    </form>
+
+    <p class="hint">
+      Já tem uma conta?
+      <a href="/login" routerLink="/login" class="link">Entrar</a>
+    </p>
+  </div>
+</div>
+
+<!-- MODAL LGPD -->
+<div class="modal-overlay" *ngIf="showModal">
+  <div class="modal">
+    <h2 *ngIf="modalType === 'terms'">📜 Termos de Uso</h2>
+    <h2 *ngIf="modalType === 'privacy'">🔒 Política de Privacidade</h2>
+
+    <div class="modal-content">
+      <p *ngIf="modalType === 'terms'">
+        Ao utilizar o MoneyMind, você concorda em fornecer informações verdadeiras e manter a confidencialidade
+        de suas credenciais de acesso. O uso indevido, reprodução ou distribuição não autorizada de conteúdo do
+        site é proibido. Reservamo-nos o direito de modificar estes termos a qualquer momento, sem aviso prévio.
+      </p>
+
+      <p *ngIf="modalType === 'privacy'">
+        O MoneyMind respeita sua privacidade e está comprometido com a proteção dos seus dados pessoais. As
+        informações coletadas são utilizadas apenas para fins de cadastro e personalização da experiência do
+        usuário. Não compartilhamos seus dados com terceiros sem seu consentimento. Você pode solicitar a exclusão
+        dos seus dados a qualquer momento conforme a LGPD (Lei nº 13.709/2018).
       </p>
     </div>
+
+    <button class="close-btn" (click)="closeModal()">Fechar</button>
   </div>
-  
+</div>

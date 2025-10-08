@@ -1,156 +1,255 @@
 /* Fundo e layout centralizado */
 .register-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background: linear-gradient(to right, #007bff, #28a745);
-    font-family: "Poppins", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 80px);
+  background: linear-gradient(to right, #007bff, #28a745);
+  font-family: "Poppins", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  padding: 40px 20px;
 }
 
 /* Cartão principal */
 .register-card {
-    background: #ffffff;
-    border-radius: 16px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-    padding: 40px 35px;
-    width: 100%;
-    max-width: 450px;
-    text-align: center;
-    animation: fadeIn 0.6s ease-out;
+  background: #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  padding: 45px 40px;
+  width: 100%;
+  max-width: 450px;
+  text-align: center;
+  animation: fadeIn 0.6s ease-out;
 }
 
 /* Título */
 .register-card h1 {
-    color: #333;
-    font-size: 1.8rem;
-    margin-bottom: 30px;
+  color: #222;
+  font-size: 1.9rem;
+  margin-bottom: 35px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 /* Formulário */
 form {
-    display: flex;
-    flex-direction: column;
-    gap: 20px; /* maior espaçamento entre os campos */
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
 }
 
-/* Form group para organizar melhor os campos */
+/* Grupos de campos */
 .form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 6px; /* espaçamento entre label e input */
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 /* Labels */
 label {
-    font-weight: 600;
-    font-size: 0.95rem;
-    text-align: left;
-    color: #555;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-align: left;
+  color: #444;
 }
 
 /* Inputs */
 input {
-    padding: 14px;
-    border-radius: 8px;
-    border: 1.5px solid #ccc;
-    transition: all 0.3s ease;
-    font-size: 1rem;
-    outline: none;
+  padding: 14px;
+  border-radius: 8px;
+  border: 1.4px solid #ccc;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+  outline: none;
 }
 
 input:focus {
-    border-color: #007bff;
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+  border-color: #007bff;
+  box-shadow: 0 0 6px rgba(0, 123, 255, 0.25);
+}
+
+/* Checkbox LGPD */
+.lgpd {
+  margin-top: 10px;
+  text-align: left;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.88rem;
+  color: #555;
+  line-height: 1.5;
+}
+
+.checkbox-label input[type="checkbox"] {
+  margin-top: 3px;
+  transform: scale(1.15);
+  accent-color: #007bff;
+}
+
+.checkbox-label a {
+  color: #007bff;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.checkbox-label a:hover {
+  text-decoration: underline;
 }
 
 /* Botão */
 button {
-    padding: 14px;
-    border: none;
-    border-radius: 8px;
-    background-color: #007bff;
-    color: white;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    margin-top: 5px;
+  padding: 14px;
+  border: none;
+  border-radius: 8px;
+  background-color: #007bff;
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 5px;
 }
 
 button:hover {
-    background-color: #0056b3;
-    transform: translateY(-1px);
+  background-color: #0056b3;
+  transform: translateY(-1px);
 }
 
 button:active {
-    transform: translateY(1px);
+  transform: translateY(1px);
 }
 
-/* Mensagem de erro */
+/* Mensagens */
 .error-message {
-    color: #e63946;
-    font-size: 0.9rem;
-    margin-top: -5px;
-    text-align: left;
+  color: #e63946;
+  font-size: 0.9rem;
+  margin-top: -5px;
+  text-align: left;
+}
+
+.success-message {
+  color: #2ecc71;
+  font-weight: 600;
+  margin-top: 10px;
+  animation: fadeIn 0.5s ease-in-out;
 }
 
 /* Dica */
 .hint {
-    margin-top: 25px;
-    font-size: 0.9rem;
-    color: #666;
-    background-color: #f7f7f7;
-    padding: 12px;
-    border-radius: 8px;
+  margin-top: 25px;
+  font-size: 0.9rem;
+  color: #666;
+  background-color: #f7f7f7;
+  padding: 12px;
+  border-radius: 8px;
 }
 
-/* Link */
+/* Link padrão */
 .link {
-    color: #007bff;
-    font-weight: 600;
-    text-decoration: none;
+  color: #007bff;
+  font-weight: 600;
+  text-decoration: none;
 }
 
 .link:hover {
-    text-decoration: underline;
+  text-decoration: underline;
 }
 
-.success-message {
-    color: #2ecc71;
-    font-weight: 600;
-    margin-top: 10px;
-    animation: fadeIn 0.5s ease-in-out;
+/* --- MODAL LGPD --- */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
 }
 
-/* Animação de entrada */
+.modal {
+  background: #fff;
+  border-radius: 12px;
+  padding: 25px 30px;
+  max-width: 550px;
+  width: 90%;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+  animation: slideUp 0.4s ease;
+}
+
+.modal h2 {
+  font-size: 1.3rem;
+  color: #007bff;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.modal-content {
+  max-height: 320px;
+  overflow-y: auto;
+  color: #444;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-bottom: 15px;
+}
+
+.close-btn {
+  background: #007bff;
+  color: #fff;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s ease;
+}
+
+.close-btn:hover {
+  background: #0056b3;
+}
+
+/* Animações */
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(25px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(40px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 /* Responsividade */
-@media (max-width: 500px) {
-    .register-card {
-        padding: 30px 20px;
-    }
+@media (max-width: 600px) {
+  .register-card {
+    padding: 35px 25px;
+  }
 
-    .register-card h1 {
-        font-size: 1.5rem;
-    }
+  .modal {
+    padding: 20px;
+  }
 
-    input {
-        font-size: 0.95rem;
-    }
-
-    button {
-        font-size: 0.95rem;
-    }
+  .modal-content {
+    font-size: 0.9rem;
+  }
 }
