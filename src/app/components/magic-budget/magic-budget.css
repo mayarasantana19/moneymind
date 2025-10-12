@@ -26,7 +26,7 @@ p {
 /* ESTILO DA CAIXA DE INPUT (RENDIMENTO) */
 /* -------------------------------------- */
 .input-box {
-  background-color: #ffffff;
+  background-color: #e0e0e0;
   border: 1px solid #e0e0e0;
   border-radius: 12px;
   padding: 20px;
@@ -39,30 +39,37 @@ p {
   position: relative; /* CORREÇÃO 1: Essencial para posicionar o input invisível */
 }
 
-.input-box label {
-  font-size: 1rem;
-  font-weight: 500;
-  color: #444;
-  margin-bottom: 10px;
-}
-
 /* Esconde o input real, deixando apenas o valor visível (como na imagem) */
-
 
 .input-box input:focus {
     outline: none;
 }
 
-.input-value-display {
-  /* Estilo do número grande (2500) */
-  font-size: 2.5rem;
+.labelRenda{
   font-weight: 700;
-  color: #0d47a1; /* Azul escuro para destaque */
+  color: #0A477A;
+}
+
+.renda {
+  /* Estilo do número grande (2500) */
+  text-align: center;
+  max-width: 400px;
+  font-size: 2.5rem;
+  font-family: inherit;
+  font-weight: 700;
+  color: #000000; 
   padding: 5px 0;
   cursor: pointer; /* Indica que é interativo */
   min-height: 40px; /* Garante altura mínima para clique */
+  background-color: #fff;
+  border: none;
+  border-radius: 0.5rem;
 }
 
+.renda:hover{
+  border: #000000;
+  border-width: 30px;
+}
 /* -------------------------------------- */
 /* CONTAINER DOS CARDS */
 /* -------------------------------------- */

@@ -32,7 +32,7 @@ export const routes: Routes = [
   // 3. ROTA PADRÃO (Redireciona a raiz "/" para o login)
   {
     path: '',
-    redirectTo: 'login',
+    redirectTo: 'painel',
     pathMatch: 'full' // Garante que só redireciona se o path for EXATAMENTE vazio
   },
 

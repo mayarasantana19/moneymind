@@ -4,23 +4,11 @@
 
   <div class="input-box">
     <!-- Rótulo do campo -->
-    <label for="renda">Sua Renda Mensal Líquida (R$):</label>
-    
-    <!-- DISPLAY GRANDE DE VALOR (VISÍVEL) -->
-    <!-- FIX: Chamar a signal rendaMensal() para obter o valor que o pipe espera. -->
-    <div class="input-value-display">
-      {{ rendaMensal() | currency:'BRL':'symbol':'1.2-2' }}
-    </div>
+    <label class="labelRenda" for="renda">Sua Renda Mensal Líquida (R$):</label>
 
     <!-- INPUT INVISÍVEL E CLICÁVEL (FUNCIONAL) -->
     <!-- Este input fica por cima do display e é onde a digitação real acontece -->
-    <input 
-      id="renda" 
-      type="number" 
-      [(ngModel)]="rendaMensal" 
-      min="0"
-      placeholder="0"
-    >
+    <input id="renda" class="renda" type="number" [(ngModel)]="rendaMensal" min="0" placeholder="0">
   </div>
 
   <div class="allocation-cards-container">

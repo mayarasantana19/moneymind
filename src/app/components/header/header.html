@@ -1,6 +1,9 @@
 <header class="header">
   <div class="header-container">
-    <a routerLink="/painel" class="logo">Money<strong>Mind</strong></a>
+    <a routerLink="/painel" class="titleLogo">
+      <span class="titleBlue">Money</span>
+      <span class="titleGreen">Mind</span>
+    </a>
     
     <button class="menu-toggle" (click)="toggleMenu()">
         <i class="bi" [class.bi-x]="isMenuOpen" [class.bi-list]="!isMenuOpen"></i>

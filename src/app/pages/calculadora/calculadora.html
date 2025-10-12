@@ -1,7 +1,112 @@
-<div class="disabled-container">
-    <div class="message-card">
-      <h1>🚧 Função desativada</h1>
-      <p>Aguarde a próxima atualização para usar esta funcionalidade.</p>
+<div class="calc-container">
+  <p>Melhorar css</p>
+  <header class="calc-header">
+    <h1>Ferramentas Práticas de Projeção</h1>
+
+    <div class="tabs">
+      <button class="tab" [class.active]="modo === 'juros'" (click)="modo = 'juros'">
+        💹 Juros Compostos
+      </button>
+      <button class="tab" [class.active]="modo === 'meta'" (click)="modo = 'meta'">
+        🎯 Meta Financeira
+      </button>
+    </div>
+
+    <p class="subtitle" *ngIf="modo === 'juros'">
+      Simule o crescimento do seu patrimônio ao longo do tempo.
+    </p>
+    <p class="subtitle" *ngIf="modo === 'meta'">
+      Descubra quanto você precisa poupar mensalmente para alcançar um objetivo.
+    </p>
+  </header>
+
+  <!-- ======== MODO JUROS COMPOSTOS ======== -->
+  <div class="calc-content" *ngIf="modo === 'juros'">
+    <div class="inputs-card card">
+      <div class="slider-group">
+        <label>Capital Inicial (R$):</label>
+        <span class="value">R$ {{ capitalInicial | number:'1.0-0' }}</span>
+        <input type="range" min="0" max="100000" step="50"
+               [(ngModel)]="capitalInicial" (input)="calcularProjecao()" />
+      </div>
+
+      <div class="slider-group">
+        <label>Aporte Mensal (R$):</label>
+        <span class="value">R$ {{ aporteMensal | number:'1.0-0' }}</span>
+        <input type="range" min="0" max="5000" step="50"
+               [(ngModel)]="aporteMensal" (input)="calcularProjecao()" />
+      </div>
+
+      <div class="slider-group">
+        <label>Taxa de Juros Anual (%):</label>
+        <span class="value">{{ taxaAnual }}%</span>
+        <input type="range" min="1" max="20" step="1"
+               [(ngModel)]="taxaAnual" (input)="calcularProjecao()" />
+      </div>
+
+      <div class="slider-group">
+        <label>Período de Investimento (Anos):</label>
+        <span class="value">{{ anos }} anos</span>
+        <input type="range" min="1" max="40" step="1"
+               [(ngModel)]="anos" (input)="calcularProjecao()" />
+      </div>
+    </div>
+
+    <div class="result-card card">
+      <h3>Seu Sonho Projetado:</h3>
+      <h2 class="final">R$ {{ montanteFinal | number:'1.2-2' }}</h2>
+      <p><strong>Total Investido (Seu Esforço):</strong><br> R$ {{ totalInvestido | number:'1.2-2' }}</p>
+      <p><strong>Total de Juros Ganhos (A Mente Trabalhando):</strong><br>
+        <span class="juros">R$ {{ totalJuros | number:'1.2-2' }}</span></p>
+      <p class="descricao">
+        Em {{ anos }} anos, você transformará R$ {{ totalInvestido | number:'1.2-2' }}
+        em R$ {{ montanteFinal | number:'1.2-2' }}.
+      </p>
     </div>
   </div>
-  
+
+  <!-- ======== MODO META FINANCEIRA ======== -->
+  <div class="calc-content" *ngIf="modo === 'meta'">
+    <div class="inputs-card card">
+      <div class="slider-group">
+        <label>Meta Financeira (R$):</label>
+        <span class="value">R$ {{ metaFinanceira | number:'1.0-0' }}</span>
+        <input type="range" min="0" max="500000" step="50"
+               [(ngModel)]="metaFinanceira" (input)="calcularMeta()" />
+      </div>
+
+      <div class="slider-group">
+        <label>Capital Inicial Existente (R$):</label>
+        <span class="value">R$ {{ capitalInicialMeta | number:'1.0-0' }}</span>
+        <input type="range" min="0" max="100000" step="50"
+               [(ngModel)]="capitalInicialMeta" (input)="calcularMeta()" />
+      </div>
+
+      <div class="slider-group">
+        <label>Taxa de Juros Anual (%):</label>
+        <span class="value">{{ taxaAnualMeta }}%</span>
+        <input type="range" min="1" max="20" step="1"
+               [(ngModel)]="taxaAnualMeta" (input)="calcularMeta()" />
+      </div>
+
+      <div class="slider-group">
+        <label>Tempo para a Meta (Anos):</label>
+        <span class="value">{{ anosMeta }} anos</span>
+        <input type="range" min="1" max="40" step="1"
+               [(ngModel)]="anosMeta" (input)="calcularMeta()" />
+      </div>
+    </div>
+
+    <div class="result-card card meta">
+      <h3>Aporte Mensal Necessário:</h3>
+      <h2 class="final green">R$ {{ aporteMensalNecessario | number:'1.2-2' }}</h2>
+      <p><strong>Total Necessário a Aportar:</strong><br> R$ {{ totalAportar | number:'1.2-2' }}</p>
+      <p><strong>Valor coberto pelo Juro/Renda:</strong><br>
+        <span class="juros">R$ {{ totalJurosMeta | number:'1.2-2' }}</span></p>
+      <p class="descricao">
+        Aportando R$ {{ aporteMensalNecessario | number:'1.2-2' }} por mês,
+        você atinge R$ {{ metaFinanceira | number:'1.0-0' }} em {{ anosMeta }} anos.
+      </p>
+    </div>
+  </div>
+</div>

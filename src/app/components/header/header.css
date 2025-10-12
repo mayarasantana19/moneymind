@@ -17,16 +17,16 @@
     margin: 0 auto;
 }
 
-.logo {
+.titleBlue, .titleGreen {
     font-size: 1.5rem;
-    font-weight: bold;
-    color: #333;
+    font-weight: bolder;
+    color: #00179b;
     text-decoration: none;
     z-index: 10; 
 }
 
-strong {
-    color: #255388;
+.titleGreen {
+    color: #0f5202;
 }
 
 /* Navegação em Desktop: Linha Horizontal */
